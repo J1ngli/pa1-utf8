@@ -26,6 +26,20 @@ int32_t capitalize_ascii(char str[]){
 }
 
 int32_t width_from_start_byte(char start_byte){
+    if((start_byte & 0b10000000)== 0b00000000){
+        return 1;
+
+    }
+    if((start_byte & 0b11100000)==0b11000000){
+        return 2;
+    }
+    if((start_byte & 0b11110000)==0b11100000){
+        return 3;
+    }
+    if((start_byte & 0b11110000)==0b11110000){
+        return 4;
+    }
+    return -1;
     
 }
 int main(){
@@ -36,6 +50,12 @@ int main(){
     char str[] = "abcd";
     ret = capitalize_ascii(str);
     printf("Capitalized String: %s\nCharacters updated: %d\n", str, ret);
+    char s[] = "Héy"; // same as { 'H', 0xC3, 0xA9, 'y', 0 },   é is start byte + 1 cont. byte
+    printf("Width: %d bytes\n", width_from_start_byte(s[1])); // start byte 0xC3 indicates 2-byte sequence
+    printf("Width: %d bytes\n", width_from_start_byte(s[2])); // start byte 0xA9 is a continuation byte, not a start byte
+
+
+
 
     return 0;
 }
