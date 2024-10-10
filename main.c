@@ -28,7 +28,6 @@ int32_t capitalize_ascii(char str[]){
 int32_t width_from_start_byte(char start_byte){
     if((start_byte & 0b10000000)== 0b00000000){
         return 1;
-
     }
     if((start_byte & 0b11100000)==0b11000000){
         return 2;
@@ -82,6 +81,32 @@ int32_t utf8_strlen(char str[]) {
     return length;
 }
 
+int32_t codepoint_index_to_byte_index(char str[], int32_t cpi){
+    int i =0;
+    int byte_idx=0;
+    while(i!=cpi){
+        unsigned char byte = str[i];
+
+        if((byte & 0b10000000) == 0b00000000){
+            byte_idx++;
+        }
+        else if ((byte & 0b11100000)==0b11000000){
+            byte_idx+=2;
+        }
+        else if((byte & 0b11110000)== 0b11100000){
+            byte_idx+=3;
+        }
+        else if((byte & 0b11111000)== 0b11110000){
+            byte_idx+=4;
+        }
+        else {
+            return -1;
+        }
+        i++;
+    }
+    return byte_idx;
+}
+
 int main(){
     printf("Is 🔥 ASCII? %d\n", is_ascii("🔥"));
     printf("Is abcd ASCII? %d\n", is_ascii("abcd"));
@@ -95,10 +120,12 @@ int main(){
     printf("Width: %d bytes\n", width_from_start_byte(s[2])); // start byte 0xA9 is a continuation byte, not a start byte
     char J[] = "Joséph";  // 6 codepoints, 7 bytes (including 'é' as 2 bytes)
     printf("Length of string %s is %d\n", J, utf8_strlen(J));  
+    //Milestone 2 bite indx
+    char str2[] = "Joséph";
+    int32_t idx = 4;
+    printf("Codepoint index %d is byte index %d\n", idx, codepoint_index_to_byte_index("Joséph", idx));
 
-    int32_t codepoint_index_to_byte_index(char str[], int32_t cpi){
-
-    }
-    
     return 0;
 }
+
+
