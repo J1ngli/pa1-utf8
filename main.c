@@ -110,7 +110,7 @@ int32_t codepoint_index_to_byte_index(char str[], int32_t cpi){
 void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char result[]) {
     // Validate inputs
     if (cpi_start < 0 || cpi_end < 0 || cpi_start > cpi_end) {
-        return; // No effect if invalid
+        return; 
     }
 
     int byte_index = 0; // Current byte index
@@ -118,16 +118,16 @@ void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char result[
     int start_byte_index = -1; // Start byte index for the substring
     int end_byte_index = -1; // End byte index for the substring
 
-    // Traverse the string to find the byte indices for cpi_start and cpi_end
+    
     while (str[byte_index] != '\0') {
-        // Check if we've reached the start codepoint index
+        
         if (cp_index == cpi_start) {
-            start_byte_index = byte_index; // Store start byte index
+            start_byte_index = byte_index; 
         }
-        // Check if we've reached the end codepoint index
+       
         if (cp_index == cpi_end) {
-            end_byte_index = byte_index; // Store end byte index
-            break; // No need to continue if we found the end
+            end_byte_index = byte_index; 
+            break; 
         }
 
         // Determine the width of the current UTF-8 character
@@ -141,29 +141,27 @@ void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char result[
         cp_index++; // Increment codepoint index
     }
 
-    // If the end byte index wasn't found, it means cpi_end is out of bounds
     if (end_byte_index == -1) {
-        end_byte_index = byte_index; // Set it to the end of the string
+        end_byte_index = byte_index; 
     }
 
-    // Copy the substring from start to end byte index
+
     int length = end_byte_index - start_byte_index; // Length of substring
     for (int j = 0; j < length; j++) {
-        result[j] = str[start_byte_index + j]; // Copy bytes
+        result[j] = str[start_byte_index + j]; // 
     }
-    result[length] = '\0'; // Null-terminate the result
+    result[length] = '\0'; 
 }
-//Milestone3
 int32_t codepoint_at(char str[], int32_t cpi) {
-    if (cpi < 0) return -1; // Invalid codepoint index
+    if (cpi < 0) return -1;  // Invalid codepoint index
 
-    int byte_index = 0; // Current byte index
-    int cp_index = 0; // Current codepoint index
+    int byte_index = 0;  // Current byte index in the string
+    int cp_index = 0;    // Current codepoint index
 
     while (str[byte_index] != '\0') {
-        // Get the width of the current codepoint
+        // Get the number of bytes in the current codepoint
         int width = width_from_start_byte(str[byte_index]);
-        if (width == -1) return -1; // Invalid UTF-8 encoding
+        if (width == -1) return -1;  // Invalid UTF-8 start byte
 
         // Check if we've reached the desired codepoint index
         if (cp_index == cpi) {
@@ -171,25 +169,31 @@ int32_t codepoint_at(char str[], int32_t cpi) {
 
             // Decode the codepoint based on its width
             if (width == 1) {
-                codepoint = str[byte_index]; // Single-byte (ASCII)
+                codepoint = str[byte_index];  // Single-byte (ASCII)
             } else if (width == 2) {
                 codepoint = ((str[byte_index] & 0x1F) << 6) | (str[byte_index + 1] & 0x3F);
             } else if (width == 3) {
-                codepoint = ((str[byte_index] & 0x0F) << 12) | ((str[byte_index + 1] & 0x3F) << 6) | (str[byte_index + 2] & 0x3F);
+                codepoint = ((str[byte_index] & 0x0F) << 12) |
+                            ((str[byte_index + 1] & 0x3F) << 6) |
+                            (str[byte_index + 2] & 0x3F);
             } else if (width == 4) {
-                codepoint = ((str[byte_index] & 0x07) << 18) | ((str[byte_index + 1] & 0x3F) << 12) | ((str[byte_index + 2] & 0x3F) << 6) | (str[byte_index + 3] & 0x3F);
+                codepoint = ((str[byte_index] & 0x07) << 18) |
+                            ((str[byte_index + 1] & 0x3F) << 12) |
+                            ((str[byte_index + 2] & 0x3F) << 6) |
+                            (str[byte_index + 3] & 0x3F);
             }
 
-            return codepoint; // Return the decoded codepoint
+            return codepoint;  // Return the decoded codepoint
         }
 
-        // Move to the next codepoint
-        byte_index += width; // Update byte index by the width of the current character
-        cp_index++; // Increment the codepoint index
+        // Move to the next codepoint by skipping the correct number of bytes
+        byte_index += width;  // Update byte index by the width of the current codepoint
+        cp_index++;  // Increment codepoint index
     }
 
-    return -1; // Codepoint index out of bounds
+    return -1;  // Codepoint index out of bounds
 }
+
 
 char is_animal_emoji_at(char str[], int32_t cpi) {
     int32_t codepoint = codepoint_at(str, cpi);
@@ -227,8 +231,8 @@ int main(){
     printf("String: 🦀🦮🦮🦀🦀🦮🦮\nSubstring: %s\n", result); // these emoji are 4 bytes long
 
     //Milestone3
-    printf("Codepoint at %d in %s is %d\n", idx, str, codepoint_at(str, idx)); // 'p' is the 4th c
-    //output is wrong need some edits
+    printf("Codepoint at %d in %s is %d\n", idx, str2, codepoint_at(str2, idx)); // 'p' is the 4th c
+   
     
     return 0;
 }
