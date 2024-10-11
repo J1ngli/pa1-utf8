@@ -263,8 +263,7 @@ int main() {
     printf("Animal emojis: ");
     int byte_index = 0;
     for (int j = 0; j < codepoints; j++) {
-        int32_t codepoint = codepoint_at(input, j);
-        if (is_animal_emoji(codepoint)) {
+        if (is_animal_emoji_at(input, j)) {  // Corrected: pass input and index j
             int width = width_from_start_byte(input[byte_index]);
             for (int k = 0; k < width; k++) {
                 printf("%c", input[byte_index + k]);
