@@ -16,8 +16,8 @@ int32_t capitalize_ascii(char str[]) {
     int i = 0;
     int n_changes = 0;
     while (str[i] != '\0') {
-        if (str[i] <= 'z' && str[i] >= 'a') {
-            str[i] -= 32;
+        if (str[i] >= 'a' && str[i] <= 'z') {
+            str[i] -= 32;  // Convert to uppercase
             n_changes++;
         }
         i++;
@@ -47,7 +47,6 @@ int32_t utf8_strlen(char str[]) {
 
     while (str[i] != '\0') {
         unsigned char byte = str[i];
-
         int width = width_from_start_byte(byte);
         if (width == -1) {
             return -1; // Invalid UTF-8 sequence
@@ -99,6 +98,7 @@ int32_t is_animal_emoji_at(char str[], int32_t cpi) {
     int32_t codepoint = codepoint_at(str, cpi);
     if (codepoint == -1) return 0;
 
+    // Unicode ranges for animal emojis
     if ((codepoint >= 0x1F400 && codepoint <= 0x1F43F) || // 🐀 to 🐿️
         (codepoint >= 0x1F980 && codepoint <= 0x1F9AC)) { // 🦀 to 🦮
         return 1;
