@@ -154,12 +154,54 @@ void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char result[
     result[length] = '\0'; // Null-terminate the result
 }
 //Milestone3
-int32_t codepoint_at(char str[], int32_t cpi){
+int32_t codepoint_at(char str[], int32_t cpi) {
+    if (cpi < 0) return -1; // Invalid codepoint index
 
+    int byte_index = 0; // Current byte index
+    int cp_index = 0; // Current codepoint index
+
+    while (str[byte_index] != '\0') {
+        // Get the width of the current codepoint
+        int width = width_from_start_byte(str[byte_index]);
+        if (width == -1) return -1; // Invalid UTF-8 encoding
+
+        // Check if we've reached the desired codepoint index
+        if (cp_index == cpi) {
+            int32_t codepoint = 0;
+
+            // Decode the codepoint based on its width
+            if (width == 1) {
+                codepoint = str[byte_index]; // Single-byte (ASCII)
+            } else if (width == 2) {
+                codepoint = ((str[byte_index] & 0x1F) << 6) | (str[byte_index + 1] & 0x3F);
+            } else if (width == 3) {
+                codepoint = ((str[byte_index] & 0x0F) << 12) | ((str[byte_index + 1] & 0x3F) << 6) | (str[byte_index + 2] & 0x3F);
+            } else if (width == 4) {
+                codepoint = ((str[byte_index] & 0x07) << 18) | ((str[byte_index + 1] & 0x3F) << 12) | ((str[byte_index + 2] & 0x3F) << 6) | (str[byte_index + 3] & 0x3F);
+            }
+
+            return codepoint; // Return the decoded codepoint
+        }
+
+        // Move to the next codepoint
+        byte_index += width; // Update byte index by the width of the current character
+        cp_index++; // Increment the codepoint index
+    }
+
+    return -1; // Codepoint index out of bounds
 }
 
-char is_animal_emoji_at(char str[], int32_t cpi){
-    
+char is_animal_emoji_at(char str[], int32_t cpi) {
+    int32_t codepoint = codepoint_at(str, cpi);
+    if (codepoint == -1) return 0; // Invalid codepoint or index
+
+    // Check if the codepoint is in the animal emoji ranges
+    if ((codepoint >= 0x1F400 && codepoint <= 0x1F43F) || // Range: 🐀 to 🐿️
+        (codepoint >= 0x1F980 && codepoint <= 0x1F9AC)) { // Range: 🦀 to 🦮
+        return 1; // True: It is an animal emoji
+    }
+
+    return 0; // False: It is not an animal emoji
 }
 
 int main(){
@@ -185,8 +227,9 @@ int main(){
     printf("String: 🦀🦮🦮🦀🦀🦮🦮\nSubstring: %s\n", result); // these emoji are 4 bytes long
 
     //Milestone3
+    printf("Codepoint at %d in %s is %d\n", idx, str, codepoint_at(str, idx)); // 'p' is the 4th c
+    //output is wrong need some edits
     
-
     return 0;
 }
 
