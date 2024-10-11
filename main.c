@@ -107,6 +107,61 @@ int32_t codepoint_index_to_byte_index(char str[], int32_t cpi){
     return byte_idx;
 }
 
+void utf8_substring(char str[], int32_t cpi_start, int32_t cpi_end, char result[]) {
+    // Validate inputs
+    if (cpi_start < 0 || cpi_end < 0 || cpi_start > cpi_end) {
+        return; // No effect if invalid
+    }
+
+    int byte_index = 0; // Current byte index
+    int cp_index = 0; // Current codepoint index
+    int start_byte_index = -1; // Start byte index for the substring
+    int end_byte_index = -1; // End byte index for the substring
+
+    // Traverse the string to find the byte indices for cpi_start and cpi_end
+    while (str[byte_index] != '\0') {
+        // Check if we've reached the start codepoint index
+        if (cp_index == cpi_start) {
+            start_byte_index = byte_index; // Store start byte index
+        }
+        // Check if we've reached the end codepoint index
+        if (cp_index == cpi_end) {
+            end_byte_index = byte_index; // Store end byte index
+            break; // No need to continue if we found the end
+        }
+
+        // Determine the width of the current UTF-8 character
+        int width = width_from_start_byte(str[byte_index]);
+        if (width == -1) {
+            return; // Invalid UTF-8 encoding, exit
+        }
+
+        // Move the byte index forward by the width of the character
+        byte_index += width;
+        cp_index++; // Increment codepoint index
+    }
+
+    // If the end byte index wasn't found, it means cpi_end is out of bounds
+    if (end_byte_index == -1) {
+        end_byte_index = byte_index; // Set it to the end of the string
+    }
+
+    // Copy the substring from start to end byte index
+    int length = end_byte_index - start_byte_index; // Length of substring
+    for (int j = 0; j < length; j++) {
+        result[j] = str[start_byte_index + j]; // Copy bytes
+    }
+    result[length] = '\0'; // Null-terminate the result
+}
+//Milestone3
+int32_t codepoint_at(char str[], int32_t cpi){
+
+}
+
+char is_animal_emoji_at(char str[], int32_t cpi){
+    
+}
+
 int main(){
     printf("Is 🔥 ASCII? %d\n", is_ascii("🔥"));
     printf("Is abcd ASCII? %d\n", is_ascii("abcd"));
@@ -124,6 +179,13 @@ int main(){
     char str2[] = "Joséph";
     int32_t idx = 4;
     printf("Codepoint index %d is byte index %d\n", idx, codepoint_index_to_byte_index("Joséph", idx));
+    //Substring Milestone2
+    char result[17];
+    utf8_substring("🦀🦮🦮🦀🦀🦮🦮", 3, 7, result);
+    printf("String: 🦀🦮🦮🦀🦀🦮🦮\nSubstring: %s\n", result); // these emoji are 4 bytes long
+
+    //Milestone3
+    
 
     return 0;
 }
