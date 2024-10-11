@@ -209,31 +209,65 @@ char is_animal_emoji_at(char str[], int32_t cpi) {
 }
 
 int main(){
-    printf("Is 🔥 ASCII? %d\n", is_ascii("🔥"));
-    printf("Is abcd ASCII? %d\n", is_ascii("abcd"));
-    
-    int32_t ret = 0;
-    char str[] = "abcd";
-    ret = capitalize_ascii(str);
-    printf("Capitalized String: %s\nCharacters updated: %d\n", str, ret);
-    char s[] = "Héy"; // same as { 'H', 0xC3, 0xA9, 'y', 0 },   é is start byte + 1 cont. byte
-    printf("Width: %d bytes\n", width_from_start_byte(s[1])); // start byte 0xC3 indicates 2-byte sequence
-    printf("Width: %d bytes\n", width_from_start_byte(s[2])); // start byte 0xA9 is a continuation byte, not a start byte
-    char J[] = "Joséph";  // 6 codepoints, 7 bytes (including 'é' as 2 bytes)
-    printf("Length of string %s is %d\n", J, utf8_strlen(J));  
-    //Milestone 2 bite indx
-    char str2[] = "Joséph";
-    int32_t idx = 4;
-    printf("Codepoint index %d is byte index %d\n", idx, codepoint_index_to_byte_index("Joséph", idx));
-    //Substring Milestone2
-    char result[17];
-    utf8_substring("🦀🦮🦮🦀🦀🦮🦮", 3, 7, result);
-    printf("String: 🦀🦮🦮🦀🦀🦮🦮\nSubstring: %s\n", result); // these emoji are 4 bytes long
+     char input[1000];
+    printf("Enter a UTF-8 encoded string: ");
+    fgets(input, sizeof(input), stdin);
 
-    //Milestone3
-    printf("Codepoint at %d in %s is %d\n", idx, str2, codepoint_at(str2, idx)); // 'p' is the 4th c
-   
-    
+    // Remove the newline character from input
+    size_t len = strlen(input);
+    if (len > 0 && input[len - 1] == '\n') {
+        input[len - 1] = '\0';
+    }
+
+    // Check if the string is valid ASCII
+    bool ascii_valid = is_ascii(input);
+    printf("Valid ASCII: %s\n", ascii_valid ? "true" : "false");
+
+    // Uppercase ASCII
+    char uppercase_input[1000];
+    strcpy(uppercase_input, input);
+    capitalize_ascii(uppercase_input);
+    printf("Uppercased ASCII: \"%s\"\n", uppercase_input);
+
+    // Length in bytes
+    printf("Length in bytes: %lu\n", strlen(input));
+
+    // Number of code points
+    int codepoints = utf8_strlen(input);
+    printf("Number of code points: %d\n", codepoints);
+
+    // Bytes per code point
+    printf("Bytes per code point: ");
+    int i = 0;
+    while (input[i] != '\0') {
+        int width = width_from_start_byte(input[i]);
+        printf("%d ", width);
+        i += width;
+    }
+    printf("\n");
+
+    // Substring of the first 6 code points
+    char result[100];
+    utf8_substring(input, 0, 6, result);
+    printf("Substring of the first 6 code points: \"%s\"\n", result);
+
+    // Code points as decimal numbers
+    printf("Code points as decimal numbers: ");
+    for (int j = 0; j < codepoints; j++) {
+        printf("%d ", codepoint_at(input, j));
+    }
+    printf("\n");
+
+    // Animal emojis
+    printf("Animal emojis: ");
+    for (int j = 0; j < codepoints; j++) {
+        int32_t codepoint = codepoint_at(input, j);
+        if (is_animal_emoji(codepoint)) {
+            printf("%c%c%c%c ", input[j*4], input[j*4 + 1], input[j*4 + 2], input[j*4 + 3]);  // print the emoji
+        }
+    }
+    printf("\n");
+
     return 0;
 }
 
