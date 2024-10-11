@@ -208,29 +208,30 @@ char is_animal_emoji_at(char str[], int32_t cpi) {
     return 0; // False: It is not an animal emoji
 }
 
-int main(){
-     char input[1000];
+int main() {
+    char input[1000];
     printf("Enter a UTF-8 encoded string: ");
     fgets(input, sizeof(input), stdin);
 
     // Remove the newline character from input
-    size_t len = strlen(input);
+    int len = 0;
+    while (input[len] != '\0') len++;
     if (len > 0 && input[len - 1] == '\n') {
         input[len - 1] = '\0';
     }
 
     // Check if the string is valid ASCII
-    bool ascii_valid = is_ascii(input);
+    int ascii_valid = is_ascii(input);
     printf("Valid ASCII: %s\n", ascii_valid ? "true" : "false");
 
     // Uppercase ASCII
     char uppercase_input[1000];
-    strcpy(uppercase_input, input);
+    for (int i = 0; i < len; i++) uppercase_input[i] = input[i];
     capitalize_ascii(uppercase_input);
     printf("Uppercased ASCII: \"%s\"\n", uppercase_input);
 
     // Length in bytes
-    printf("Length in bytes: %lu\n", strlen(input));
+    printf("Length in bytes: %d\n", len);
 
     // Number of code points
     int codepoints = utf8_strlen(input);
@@ -260,15 +261,19 @@ int main(){
 
     // Animal emojis
     printf("Animal emojis: ");
+    int byte_index = 0;
     for (int j = 0; j < codepoints; j++) {
         int32_t codepoint = codepoint_at(input, j);
         if (is_animal_emoji(codepoint)) {
-            printf("%c%c%c%c ", input[j*4], input[j*4 + 1], input[j*4 + 2], input[j*4 + 3]);  // print the emoji
+            int width = width_from_start_byte(input[byte_index]);
+            for (int k = 0; k < width; k++) {
+                printf("%c", input[byte_index + k]);
+            }
+            printf(" ");
         }
+        byte_index += width_from_start_byte(input[byte_index]);
     }
     printf("\n");
 
     return 0;
 }
-
-
